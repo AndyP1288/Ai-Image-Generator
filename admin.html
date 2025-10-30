@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin — Logs</title>
+<style>
+  body { font-family: Arial, sans-serif; background:#111; color:#fff; padding:2rem; }
+  .box { max-width:900px; margin:0 auto; }
+  input[type="password"] { padding:.5rem; width:60%; border-radius:6px; border:none; }
+  button { padding:.6rem 1rem; margin-left:.5rem; border-radius:6px; border:none; background:#28a; color:#fff; cursor:pointer; }
+  pre { background:#000; padding:1rem; border-radius:8px; overflow:auto; max-height:60vh; }
+  .note { color:#aaa; margin-top:.5rem; }
+</style>
+</head>
+<body>
+  <div class="box">
+    <h1>Admin Logs</h1>
+    <p>Enter admin password to view logs. The password is stored server-side and never in this file.</p>
+
+    <div>
+      <input id="pwd" type="password" placeholder="Admin password">
+      <button id="btn">View Logs</button>
+    </div>
+    <p class="note">Tip: the request sends the password in a header. Make sure you are using HTTPS.</p>
+
+    <div id="output" style="margin-top:1rem;"></div>
+  </div>
+
+<script>
+document.getElementById('btn').addEventListener('click', async () => {
+  const pwd = document.getElementById('pwd').value;
+  const out = document.getElementById('output');
+  out.innerHTML = 'Loading…';
+
+  try {
+    const res = await fetch('/admin/logs', {
+      method: 'GET',
+      headers: {
+        'x-admin-password': pwd
+      }
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      out.innerHTML = '<p style="color:tomato;">Error: ' + (data.error || res.status) + '</p>';
+      return;
+    }
+
+    if (!data.logs || data.logs.length === 0) {
+      out.innerHTML = '<p>No logs found.</p>';
+      return;
+    }
+
+    // render logs nicely
+    const pretty = JSON.stringify(data.logs, null, 2);
+    out.innerHTML = '<pre>' + pretty + '</pre>';
+  } catch (err) {
+    out.innerHTML = '<p style="color:tomato;">Network error: ' + err.message + '</p>';
+  }
+});
+</script>
+</body>
+</html>
