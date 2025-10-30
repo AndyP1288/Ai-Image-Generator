@@ -1,7 +1,6 @@
 const express = require('express');
-const fetch = require('node-fetch');
-const path = require('path');
 const cors = require('cors');
+const path = require('path');
 const app = express();
 
 app.use(cors());
@@ -12,7 +11,6 @@ app.use(express.static(path.join(__dirname))); // Serve index.html
 const HF_MODEL = "black-forest-labs/FLUX.1-dev"; // replace if you prefer another model
 const HF_TOKEN = process.env.HF_TOKEN; // set this in Render environment variables
 
-// API endpoint for image generation
 app.post('/generate', async (req, res) => {
   const { prompt } = req.body;
   if (!prompt) return res.status(400).json({ error: "Missing prompt" });
